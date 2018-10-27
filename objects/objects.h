@@ -12,7 +12,10 @@ typedef struct {
   int pixelHeight;
 } Window;
 
-enum ObjectType {SphereObject};
+enum ObjectType {
+  SphereObject,
+  PlaneObject
+};
 
 typedef struct RenderObject{
   void* object;
@@ -44,6 +47,5 @@ typedef struct {
 
 void addToList (RenderList* list, RenderObject* obj);
 Vector framebuffToUniverse (Window* w, int x, int y);
-Vector rayToPoint(Ray r, double t);
 
 #endif

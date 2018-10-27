@@ -4,6 +4,7 @@
 #include <math.h>
 #include "vector.h"
 #include "objects/sphere.h"
+#include "objects/polygon.h"
 #include "objects/objects.h"
 #include "raytracing.h"
 #include "renderEngine.h"
@@ -50,7 +51,24 @@ void createAndPackSphere(double radius, Vector* center, RenderObject* ro, Color 
   ro->object = s;
   ro->intersectionFunction = &raySphereIntersection;
   ro->normalFunction = &sphereNormal;
-  //ro->type = Sphere;
+  ro->type = SphereObject;
+  ro->color = color;
+}
+
+void createAndPackPlane(int pointCount, Vector** points, RenderObject* ro, Color color) {
+  Polygon* p = (Polygon*) malloc (sizeof(Polygon));
+  p->pointCount = pointCount;
+  p->points = points;
+  p->plane = NULL;
+  p->flatPoints = NULL;
+
+  calculatePolygonPlane(p);
+  flattenPolygon(p);
+
+  ro->object = p;
+  ro->intersectionFunction = &rayPlaneIntersection;
+  ro->normalFunction = &planeNormal;
+  ro->type = PlaneObject;
   ro->color = color;
 }
 
@@ -155,6 +173,21 @@ int main (int argc, char** argv) {
   renderList = (RenderList*)malloc(sizeof(RenderList));
   eye = (Vector*)malloc(sizeof(Vector));
   w = (Window*)malloc(sizeof(Window));
+
+  // plane
+  RenderObject* ro;
+  Vector** points1 = (Vector**) malloc (sizeof(Vector*) * 5);
+
+  points1[0] = createVector( 0.0 , 1.0 , 0.0 );
+  points1[1] = createVector( -0.9510565400123596 , 0.30901697278022766 , -0.9510565400123596 );
+  points1[2] = createVector( -0.5877851843833923 , -0.8090170621871948 , -0.5877851843833923 );
+  points1[3] = createVector( 0.5877853631973267 , -0.8090169429779053 , 0.5877853631973267 );
+  points1[4] = createVector( 0.9510564804077148 , 0.3090171217918396 , 0.9510564804077148 );
+
+  ro = (RenderObject*)malloc(sizeof(RenderObject));
+  createAndPackPlane(5, points1, ro, (Color){1, 0.5, 0.2, 1});
+  addToList(renderList, ro);
+  // end plane
 
   initializeFrameBuffer();
   initializeEye(eye);

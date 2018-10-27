@@ -18,7 +18,3 @@ Vector framebuffToUniverse (Window* w, int x, int y) {
     w->bot + ((y + 0.5) / (float)w->pixelHeight) * (w->top - w->bot)
   };
 }
-
-Vector rayToPoint(Ray r, double t) {
-  return addVector(*r.origin, multVector(*r.direction, t));
-}
