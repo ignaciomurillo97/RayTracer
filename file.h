@@ -3,6 +3,7 @@
 #include "raytracing.h"
 #include "stdio.h"
 #include "stdlib.h"
+#include "objects/objects.h"
 
 #define SWAP(x) ( ((x) << 24) | \
          (((x) << 8) & 0x00ff0000) | \

@@ -22,6 +22,15 @@ double smallestPositive(double* list) {
   return -1;
 } 
 
+Vector closestNormal (Vector direction, Vector normal) {
+  double dotProd = dotProduct(direction, normal);
+  if (dotProd < 0) {
+    return multVector(normal, -1);
+  } else {
+    return normal;
+  }
+}
+
 Intersection firstIntersection (Ray r, RenderList* renderList) {
   RenderObject* ro = renderList->start;
   double tMin = INFINITY;
@@ -39,6 +48,7 @@ Intersection firstIntersection (Ray r, RenderList* renderList) {
   if (tMin != INFINITY) {
     Vector point = rayToPoint(r, tMin);
     Vector normal = (Vector)(*tMinObject->normalFunction)(point, tMinObject->object);
+    normal = closestNormal(*r.direction, normal);
     return (Intersection){
       createVector(normal.x, normal.y, normal.z),
       createVector(point.x, point.y, point.z),

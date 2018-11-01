@@ -73,13 +73,12 @@ void createAndPackPlane(int pointCount, Vector** points, RenderObject* ro, Color
 }
 
 // TODO cambiar para usar scanf
-Light* readFromFile(char* filename, RenderList* renderList) {
+void readFromFile(char* filename, RenderList* renderList) {
   FILE * fp;
   char * line = NULL;
   size_t len = 0;
   ssize_t read;
   RenderObject*  ro;
-  Light* lights;
   int i = 0;
 
   fp = fopen(filename, "r");
@@ -162,7 +161,6 @@ Light* readFromFile(char* filename, RenderList* renderList) {
   fclose(fp);
   if (line)
     free(line);
-  return lights;
 }
 
 int main (int argc, char** argv) {
@@ -174,25 +172,10 @@ int main (int argc, char** argv) {
   eye = (Vector*)malloc(sizeof(Vector));
   w = (Window*)malloc(sizeof(Window));
 
-  // plane
-  RenderObject* ro;
-  Vector** points1 = (Vector**) malloc (sizeof(Vector*) * 5);
-
-  points1[0] = createVector( 0.0 , 1.0 , 0.0 );
-  points1[1] = createVector( -0.9510565400123596 , 0.30901697278022766 , -0.9510565400123596 );
-  points1[2] = createVector( -0.5877851843833923 , -0.8090170621871948 , -0.5877851843833923 );
-  points1[3] = createVector( 0.5877853631973267 , -0.8090169429779053 , 0.5877853631973267 );
-  points1[4] = createVector( 0.9510564804077148 , 0.3090171217918396 , 0.9510564804077148 );
-
-  ro = (RenderObject*)malloc(sizeof(RenderObject));
-  createAndPackPlane(5, points1, ro, (Color){1, 0.5, 0.2, 1});
-  addToList(renderList, ro);
-  // end plane
-
   initializeFrameBuffer();
   initializeEye(eye);
   initializeWindow(w);
-  lights = readFromFile(argv[1], renderList); 
+  readFromFile(argv[1], renderList); 
 
   render(w, eye, lights, lightCount, frameBuffer, renderList);
 
