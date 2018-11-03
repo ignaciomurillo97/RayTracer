@@ -1,7 +1,7 @@
 #include "linkedlist.h"
 #include <stdlib.h>
 
-void add( void* element, LinkedList* list ){
+void addToLinkedList( void* element, LinkedList* list ){
 	Container* c = (Container*) malloc (sizeof(Container));
 	c->element = element;
 	if (list->start == NULL) {

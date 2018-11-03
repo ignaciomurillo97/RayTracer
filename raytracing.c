@@ -2,18 +2,20 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <sys/types.h>
 #include "vector.h"
 #include "objects/sphere.h"
 #include "objects/polygon.h"
 #include "objects/objects.h"
 #include "raytracing.h"
 #include "renderEngine.h"
+#include "Helpers/linkedlist.h"
 #include "file.h"
 
 Color** frameBuffer;
 RenderList* renderList;
 
-Light* lights;
+LinkedList *lights;
 int lightCount;
 Vector* eye;
 Window* w;
@@ -40,8 +42,14 @@ void initializeEye(Vector* eye) {
   eye->z = -40;
 }
 
-Light createLight(Vector pos, double intensity, double cConstant, double cLinear, double cCuadratic) {
-  return (Light) {pos, intensity, cConstant, cLinear, cCuadratic};
+Light* createLight(Vector pos, double intensity, double cConstant, double cLinear, double cCuadratic) {
+  Light* l = (Light*)malloc(sizeof(Light));
+  l->position = pos;
+  l->intensity = intensity;
+  l->cConstant = cConstant;
+  l->cLinear = cLinear;
+  l->cCuadratic = cCuadratic;
+  return l;
 }
 
 void createAndPackSphere(double radius, Vector* center, RenderObject* ro, Color color) {
@@ -72,6 +80,40 @@ void createAndPackPlane(int pointCount, Vector** points, RenderObject* ro, Color
   ro->color = color;
 }
 
+int wildcmp(const char *wild, const char *string) {
+  // Written by Jack Handy - <A href="mailto:jakkhandy@hotmail.com">jakkhandy@hotmail.com</A>
+  const char *cp = NULL, *mp = NULL;
+
+  while ((*string) && (*wild != '*')) {
+    if ((*wild != *string) && (*wild != '?')) {
+      return 0;
+    }
+    wild++;
+    string++;
+  }
+
+  while (*string) {
+    if (*wild == '*') {
+      if (!*++wild) {
+        return 1;
+      }
+      mp = wild;
+      cp = string+1;
+    } else if ((*wild == *string) || (*wild == '?')) {
+      wild++;
+      string++;
+    } else {
+      wild = mp;
+      string = cp++;
+    }
+  }
+
+  while (*wild == '*') {
+    wild++;
+  }
+  return !*wild;
+}
+
 // TODO cambiar para usar scanf
 void readFromFile(char* filename, RenderList* renderList) {
   FILE * fp;
@@ -79,84 +121,44 @@ void readFromFile(char* filename, RenderList* renderList) {
   size_t len = 0;
   ssize_t read;
   RenderObject*  ro;
-  int i = 0;
 
   fp = fopen(filename, "r");
   if (fp == NULL){
     exit(EXIT_FAILURE);
   }
 
-  if ((read = getline(&line, &len, fp)) != -1) {
-    char* lightCountChar = strtok(line, "\n");
-    if (lightCountChar == NULL) exit(EXIT_FAILURE);
-    lightCount = atoi(lightCountChar);
-    if (lightCount == 0) exit(EXIT_FAILURE);
-    lights = (Light*)malloc(sizeof(Light) * lightCount);
-  }
-
   while ((read = getline(&line, &len, fp)) != -1) {
-    char* type = strtok(line, ",");
-    if (type == NULL) exit(EXIT_FAILURE);
+    if (!wildcmp("//*", line)) {
+      if (wildcmp("light*", line)) {
+        double positionX;
+        double positionY;
+        double positionZ;
+        double intensity;
+        double constantComp;
+        double linearComp;
+        double cuadraticComp;
 
-    if (strcmp(type, "S") == 0) {
-      char* radiusChar = strtok(NULL, ",");
-      if (radiusChar == NULL) exit(EXIT_FAILURE);
-      double radius = strtod(radiusChar, NULL);
+        int itemsRead = sscanf(line, "light (%lf, %lf, %lf) %lf (%lf, %lf, %lf)", &positionX,  &positionY,  &positionZ,  &intensity,  &constantComp,  &linearComp,  &cuadraticComp);
+        if (itemsRead != 7) exit (EXIT_FAILURE);
+        printf("items read: %d", itemsRead);
+        addToLinkedList((void*) createLight((Vector){positionX, positionY, positionZ}, intensity, constantComp, linearComp, cuadraticComp), lights);
+      } else if (wildcmp("sphere*", line)) {
+        double radius;
+        double centerX;
+        double centerY;
+        double centerZ;
+        double colorR;
+        double colorG;
+        double colorB;
 
-      char* centerXChar = strtok(NULL, ",");
-      if (centerXChar == NULL) exit(EXIT_FAILURE);
-      double centerX = strtod(centerXChar, NULL);
-      char* centerYChar = strtok(NULL, ",");
-      if (centerYChar == NULL) exit(EXIT_FAILURE);
-      double centerY = strtod(centerYChar, NULL);
-      char* centerZChar = strtok(NULL, ",");
-      if (centerZChar == NULL) exit(EXIT_FAILURE);
-      double centerZ = strtod(centerZChar, NULL);
-
-      char* colorRChar = strtok(NULL, ",");
-      if (colorRChar == NULL) exit(EXIT_FAILURE);
-      double colorR = strtod(colorRChar, NULL);
-      char* colorGChar = strtok(NULL, ",");
-      if (colorGChar == NULL) exit(EXIT_FAILURE);
-      double colorG = strtod(colorGChar, NULL);
-      char* colorBChar = strtok(NULL, "\n");
-      if (colorBChar == NULL) exit(EXIT_FAILURE);
-      double colorB = strtod(colorBChar, NULL);
-
-      ro = (RenderObject*)malloc(sizeof(RenderObject));
-      createAndPackSphere(radius, createVector(centerX, centerY, centerZ), ro, (Color){colorR, colorG, colorB, 1});
-      addToList(renderList, ro);
-    } 
-    else if (strcmp(type, "L") == 0) {
-      char* positionXChar = strtok(NULL, ",");
-      if (positionXChar == NULL) exit(EXIT_FAILURE);
-      double positionX = strtod(positionXChar, NULL);
-      char* positionYChar = strtok(NULL, ",");
-      if (positionYChar == NULL) exit(EXIT_FAILURE);
-      double positionY = strtod(positionYChar, NULL);
-      char* positionZChar = strtok(NULL, ",");
-      if (positionZChar == NULL) exit(EXIT_FAILURE);
-      double positionZ = strtod(positionZChar, NULL);
-
-      char* intenstyChar = strtok(NULL, ",");
-      if (intenstyChar == NULL) exit(EXIT_FAILURE);
-      double intensity = strtod(intenstyChar, NULL);
-
-      char* constantCompChar = strtok(NULL, ",");
-      if (constantCompChar == NULL) exit(EXIT_FAILURE);
-      double constantComp = strtod(constantCompChar, NULL);
-      char* linearCompChar = strtok(NULL, ",");
-      if (linearCompChar == NULL) exit(EXIT_FAILURE);
-      double linearComp = strtod(linearCompChar, NULL);
-      char* cuadraticCompChar = strtok(NULL, "\n");
-      if (cuadraticCompChar == NULL) exit(EXIT_FAILURE);
-      double cuadraticComp = strtod(cuadraticCompChar, NULL);
-
-      lights[i] = createLight((Vector){positionX, positionY, positionZ}, intensity, constantComp, linearComp, cuadraticComp);
-      i++;
+        int itemsRead = sscanf(line, "sphere %lf (%lf, %lf, %lf) (%lf, %lf, %lf)", &radius, &centerX, &centerY, &centerZ, &colorR, &colorG, &colorB);
+        if (itemsRead != 7) exit (EXIT_FAILURE);
+        ro = (RenderObject*)malloc(sizeof(RenderObject));
+        createAndPackSphere(radius, createVector(centerX, centerY, centerZ), ro, (Color){colorR, colorG, colorB, 1});
+        addToList(renderList, ro);
+      }
     }
   }
-
 
   fclose(fp);
   if (line)
@@ -171,6 +173,7 @@ int main (int argc, char** argv) {
   renderList = (RenderList*)malloc(sizeof(RenderList));
   eye = (Vector*)malloc(sizeof(Vector));
   w = (Window*)malloc(sizeof(Window));
+  lights = (LinkedList*)malloc(sizeof(LinkedList));
 
   initializeFrameBuffer();
   initializeEye(eye);

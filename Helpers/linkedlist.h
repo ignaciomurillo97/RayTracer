@@ -12,4 +12,6 @@ typedef struct LinkedList {
 	Container* end;
 } LinkedList;
 
+void addToLinkedList( void* element, LinkedList* list );
+
 #endif

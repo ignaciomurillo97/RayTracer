@@ -1,7 +1,9 @@
 #ifndef H_RENDER_ENGINE
 #define H_RENDER_ENGINE
+#include "Helpers/linkedlist.h"
+#include "objects/objects.h"
 
-void render (Window* w, Vector* eye, Light* light, int lightCount , Color** frameBuffer, RenderList* renderList);
+void render (Window* w, Vector* eye, LinkedList* light, int lightCount , Color** frameBuffer, RenderList* renderList);
 
 #define H_SIZE 1008
 #define V_SIZE 576

@@ -25,9 +25,9 @@ double smallestPositive(double* list) {
 Vector closestNormal (Vector direction, Vector normal) {
   double dotProd = dotProduct(direction, normal);
   if (dotProd < 0) {
-    return multVector(normal, -1);
-  } else {
     return normal;
+  } else {
+    return multVector(normal, -1);
   }
 }
 
@@ -83,15 +83,20 @@ double diffuseCoeficient(Light light, Intersection i) {
   return coef;
 }
 
-Color whatColor(Ray r, RenderList* renderList, Light* lights, int lightCount) {
+Color whatColor(Ray r, RenderList* renderList, LinkedList* lights, int lightCount) {
   double diffCoef = 0;
 
   Intersection intersection = firstIntersection(r, renderList);
   if (intersection.object != NULL) {
     Color objColor = intersection.object->color;
-    for (int i = 0; i < lightCount; i++) {
-      diffCoef += diffuseCoeficient(lights[i], intersection) * lights[i].intensity + bgIntensity;
+
+    Container* c = lights->start;
+    while (c != NULL) {
+      Light l = *(Light*)c->element;
+      diffCoef += diffuseCoeficient(l, intersection) * l.intensity + bgIntensity;
+      c = c->next;
     }
+
     diffCoef = crop(diffCoef);
     objColor = colorMult(objColor, diffCoef);
     return objColor;
@@ -99,7 +104,7 @@ Color whatColor(Ray r, RenderList* renderList, Light* lights, int lightCount) {
   return bgColor;
 }
 
-void render (Window* w, Vector* eye, Light* lights, int lightCount, Color** frameBuffer, RenderList* renderList) {
+void render (Window* w, Vector* eye, LinkedList* lights, int lightCount, Color** frameBuffer, RenderList* renderList) {
   int x, y;
 
   for ( y = 0; y < w->pixelHeight; y++ ) {
