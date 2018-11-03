@@ -33,5 +33,6 @@ void printVector(Vector v);
 Vector rayToPoint(Ray r, double t);
 bool colinearPoints(Vector a, Vector b, Vector c);
 Vector crossProduct (Vector v1, Vector v2);
+Vector reflectVector(Vector v, Vector ref);
 
 #endif

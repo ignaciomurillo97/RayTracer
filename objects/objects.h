@@ -24,6 +24,8 @@ typedef struct RenderObject{
   enum ObjectType type;
   struct RenderObject* next;
   Color color;
+  double diffuseCoefficient;
+  double specularCoefficient;
 } RenderObject;
 
 typedef struct {
@@ -47,5 +49,6 @@ typedef struct {
 
 void addToList (RenderList* list, RenderObject* obj);
 Vector framebuffToUniverse (Window* w, int x, int y);
+double attenuationFactor (Light light, double distToLight);
 
 #endif

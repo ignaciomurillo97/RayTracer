@@ -38,7 +38,7 @@ Intersection firstIntersection (Ray r, RenderList* renderList) {
   while (ro != NULL) {
     double* tList = (double*)(*(ro->intersectionFunction))(r, (void*)ro->object);
     double newTMin = smallestPositive(tList);
-    if (newTMin != -1 && newTMin < tMin) {
+    if (newTMin != -1 && newTMin < tMin && newTMin > EPSILON) {
       tMin = newTMin;
       tMinObject = ro;
     }
@@ -62,6 +62,19 @@ Color colorMult(Color c, double scalar) {
   return (Color){c.r * scalar, c.g * scalar, c.b * scalar, c.a};
 }
 
+
+Color colorAdd(Color c1, Color c2) {
+  return (Color){c1.r + c2.r, c1.g + c2.g, c1.b + c2.b, 1};
+}
+
+Color colorSubtract(Color c1, Color c2){
+  return (Color){c1.r - c2.r, c1.g - c2.g, c1.b - c2.b, 1};
+}
+
+Color colorApproach(Color base, Color target, double percentage) {
+  return colorAdd(base, colorMult(colorSubtract(target, base), percentage));
+}
+
 double crop (double n) {
   if (n < 0) {
     return 0;
@@ -74,31 +87,55 @@ double crop (double n) {
 
 double diffuseCoeficient(Light light, Intersection i) {
   Vector l = subtractVector(light.position, *i.contactPoint);
-  double mag = magnitude(l);
+  double distToLight = magnitude(l);
   l = normalize(l);
   double coef = dotProduct(l, *i.normal) * diffuseCorrection;
-  double fAtt = crop(1/ (light.cConstant + light.cLinear * mag + light.cCuadratic * pow(mag, 2)));
-  coef *= fAtt;
+  double fAtt = crop(1/ attenuationFactor(light, distToLight));
+  coef = coef * fAtt * light.intensity;
   if (coef < 0) return 0;
+  return coef;
+}
+
+double specularCoeficient(Light light, Ray ray, Intersection i, double specularObjPercent) {
+  Vector l = subtractVector(light.position, *i.contactPoint);
+  double distToLight = magnitude(l);
+  l = normalize(l);
+  Vector dirInv = multVector(*ray.direction, -1);
+  Vector reflectedVector = reflectVector(l, *i.normal);
+  double coef = dotProduct(dirInv, reflectedVector);
+  double fAtt = crop(1/ attenuationFactor(light, distToLight));
+  if (coef < 0) return 0;
+  coef = pow(coef, specularObjPercent);
+  coef = coef * fAtt * light.intensity;
   return coef;
 }
 
 Color whatColor(Ray r, RenderList* renderList, LinkedList* lights, int lightCount) {
   double diffCoef = 0;
+  double specCoef = 0;
 
   Intersection intersection = firstIntersection(r, renderList);
   if (intersection.object != NULL) {
     Color objColor = intersection.object->color;
+    double specularObjPercent = intersection.object->specularCoefficient;
 
     Container* c = lights->start;
     while (c != NULL) {
-      Light l = *(Light*)c->element;
-      diffCoef += diffuseCoeficient(l, intersection) * l.intensity + bgIntensity;
+      Light light = *(Light*)c->element;
+      Vector l = subtractVector(light.position, *intersection.contactPoint);
+      l = normalize(l);
+      Ray rayToLight = (Ray) {intersection.contactPoint, &l};
+      if (firstIntersection(rayToLight, renderList).object == NULL) {
+        diffCoef += diffuseCoeficient(light, intersection);
+        specCoef += specularCoeficient(light, r, intersection, specularObjPercent);
+      }
       c = c->next;
     }
 
-    diffCoef = crop(diffCoef);
+    diffCoef = crop(diffCoef) + bgIntensity;
+    specCoef = crop(specCoef);
     objColor = colorMult(objColor, diffCoef);
+    objColor = colorApproach(objColor, (Color){1, 1, 1, 1}, specCoef);
     return objColor;
   }
   return bgColor;

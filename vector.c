@@ -8,12 +8,14 @@ Vector* createVector(double x, double y, double z) {
   v->x = x;
   v->y = y;
   v->z = z;
+  return v;
 }
 
 VectorUV* createVectorUV(double u, double v) {
   VectorUV* vec = (VectorUV*)malloc(sizeof(VectorUV));
   vec->u = u;
   vec->v = v;
+  return vec;
 }
 
 VectorUV dropComponent(Vector v, int component) {
@@ -85,4 +87,12 @@ bool colinearPoints(Vector a, Vector b, Vector c) {
 
   if (ab + bc == ac) return true;
   return false;
+}
+
+Vector reflectVector(Vector v, Vector ref) {
+  double proyection = dotProduct(v, ref);
+  Vector proyectedVector = multVector(ref, proyection);
+  Vector offset = subtractVector(v, proyectedVector);
+  offset = multVector(offset, -1);
+  return addVector(proyectedVector, offset);
 }
