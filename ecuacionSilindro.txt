@@ -1,0 +1,43 @@
+
+x = (xe + t*xd)
+y = (ye + t*yd)
+z = (ze + t*zd)
+
+1:
+((xe + t*xd) - (x0 + (((xe + t*xd) - x0)*xQ + ((ye + t*yd) - y0)*yQ + ((ze + t*zd) - z0)*zQ)*xQ)) ^ 2 +
+((ye + t*yd) - (y0 + (((xe + t*xd) - x0)*xQ + ((ye + t*yd) - y0)*yQ + ((ze + t*zd) - z0)*zQ)*yQ)) ^ 2 +
+((ze + t*zd) - (z0 + (((xe + t*xd) - x0)*xQ + ((ye + t*yd) - y0)*yQ + ((ze + t*zd) - z0)*zQ)*zQ)) ^ 2 - R ^ 2 = 0
+
+2:
+(xe + t*xd - x0 + (((xe + t*xd) - x0)xQ + ((ye + t*yd) - y0)yQ + ((ze + t*zd) - z0)zQ) * xQ) ^ 2 +
+(ye + t*yd - y0 + (((xe + t*xd) - x0)xQ + ((ye + t*yd) - y0)yQ + ((ze + t*zd) - z0)zQ) * yQ) ^ 2 +
+(ze + t*zd - z0 + (((xe + t*xd) - x0)xQ + ((ye + t*yd) - y0)yQ + ((ze + t*zd) - z0)zQ) * zQ) ^ 2 - R ^ 2 = 0
+
+3:
+(xe + t*xd - x0 + ((xe*xQ + t*xd*xQ - x0*xQ) + (ye*yQ + t*yd*yQ - y0*yQ) + (ze*zQ + t*zd*zQ - z0*zQ)) * xQ) ^ 2 +
+(ye + t*yd - y0 + ((xe*xQ + t*xd*xQ - x0*xQ) + (ye*yQ + t*yd*yQ - y0*yQ) + (ze*zQ + t*zd*zQ - z0*zQ)) * yQ) ^ 2 +
+(ze + t*zd - z0 + ((xe*xQ + t*xd*xQ - x0*xQ) + (ye*yQ + t*yd*yQ - y0*yQ) + (ze*zQ + t*zd*zQ - z0*zQ)) * zQ) ^ 2 - R ^ 2 = 0
+
+4:
+(xe + t*xd - x0 + xe*xQ*xQ + t*xd*xQ*xQ - x0*xQ*xQ + ye*yQ*xQ + t*yd*yQ*xQ - y0*yQ*xQ + ze*zQ*xQ + t*zd*zQ*xQ - z0*zQ*xQ) ^ 2 +
+(ye + t*yd - y0 + xe*xQ*yQ + t*xd*xQ*yQ - x0*xQ*yQ + ye*yQ*yQ + t*yd*yQ*yQ - y0*yQ*yQ + ze*zQ*yQ + t*zd*zQ*yQ - z0*zQ*yQ) ^ 2 +
+(ze + t*zd - z0 + xe*xQ*zQ + t*xd*xQ*zQ - x0*xQ*zQ + ye*yQ*zQ + t*yd*yQ*zQ - y0*yQ*zQ + ze*zQ*zQ + t*zd*zQ*zQ - z0*zQ*zQ) ^ 2 - R ^ 2 = 0
+
+5:
+(xe + t*xd - x0 + xe*xQ^2 + t*xd*xQ^2 - x0*xQ^2 + ye*yQ*xQ + t*yd*yQ*xQ - y0*yQ*xQ + ze*zQ*xQ + t*zd*zQ*xQ - z0*zQ*xQ) ^ 2 +
+(ye + t*yd - y0 + xe*xQ*yQ + t*xd*xQ*yQ - x0*xQ*yQ + ye*yQ^2 + t*yd*yQ^2 - y0*yQ^2 + ze*zQ*yQ + t*zd*zQ*yQ - z0*zQ*yQ) ^ 2 +
+(ze + t*zd - z0 + xe*xQ*zQ + t*xd*xQ*zQ - x0*xQ*zQ + ye*yQ*zQ + t*yd*yQ*zQ - y0*yQ*zQ + ze*zQ^2 + t*zd*zQ^2 - z0*zQ^2) ^ 2 - R ^ 2 = 0
+
+6:
+(xe^2 + t*xd*xe - x0*xe + xe*xQ^2*xe + t*xd*xQ^2*xe - x0*xQ^2*xe + ye*yQ*xQ*xe + t*yd*yQ*xQ*xe - y0*yQ*xQ*xe + ze*zQ*xQ*xe + t*zd*zQ*xQ*xe - z0*zQ*xQ*xe) +
+(xe*t*xd + (t*xd)^2 - x0*t*xd + xe*xQ^2*t*xd + t^2*xd*xQ^2*xd - x0*xQ^2*t*xd + ye*yQ*xQ*t*xd + t^2*yd*yQ*xQ*xd - y0*yQ*xQ*t*xd + ze*zQ*xQ*t*xd + t^2*zd*zQ*xQ*xd - z0*zQ*xQ*t*xd) +
+(xe*x0 + t*xd*x0 - x0^2 + xe*xQ^2*x0 + t*xd*xQ^2*x0 - x0^2*xQ^2 + ye*yQ*xQ*x0 + t*yd*yQ*xQ*x0 - y0*yQ*xQ*x0 + ze*zQ*xQ*x0 + t*zd*zQ*xQ*x0 - z0*zQ*xQ*x0) +
+(xe + t*xd - x0 + xe*xQ^2 + t*xd*xQ^2 - x0*xQ^2 + ye*yQ*xQ + t*yd*yQ*xQ - y0*yQ*xQ + ze*zQ*xQ + t*zd*zQ*xQ - z0*zQ*xQ) +
+(xe + t*xd - x0 + xe*xQ^2 + t*xd*xQ^2 - x0*xQ^2 + ye*yQ*xQ + t*yd*yQ*xQ - y0*yQ*xQ + ze*zQ*xQ + t*zd*zQ*xQ - z0*zQ*xQ) +
+(xe + t*xd - x0 + xe*xQ^2 + t*xd*xQ^2 - x0*xQ^2 + ye*yQ*xQ + t*yd*yQ*xQ - y0*yQ*xQ + ze*zQ*xQ + t*zd*zQ*xQ - z0*zQ*xQ) +
+(xe + t*xd - x0 + xe*xQ^2 + t*xd*xQ^2 - x0*xQ^2 + ye*yQ*xQ + t*yd*yQ*xQ - y0*yQ*xQ + ze*zQ*xQ + t*zd*zQ*xQ - z0*zQ*xQ) +
+(xe + t*xd - x0 + xe*xQ^2 + t*xd*xQ^2 - x0*xQ^2 + ye*yQ*xQ + t*yd*yQ*xQ - y0*yQ*xQ + ze*zQ*xQ + t*zd*zQ*xQ - z0*zQ*xQ) +
+(xe + t*xd - x0 + xe*xQ^2 + t*xd*xQ^2 - x0*xQ^2 + ye*yQ*xQ + t*yd*yQ*xQ - y0*yQ*xQ + ze*zQ*xQ + t*zd*zQ*xQ - z0*zQ*xQ) +
+(xe + t*xd - x0 + xe*xQ^2 + t*xd*xQ^2 - x0*xQ^2 + ye*yQ*xQ + t*yd*yQ*xQ - y0*yQ*xQ + ze*zQ*xQ + t*zd*zQ*xQ - z0*zQ*xQ) +
+(xe + t*xd - x0 + xe*xQ^2 + t*xd*xQ^2 - x0*xQ^2 + ye*yQ*xQ + t*yd*yQ*xQ - y0*yQ*xQ + ze*zQ*xQ + t*zd*zQ*xQ - z0*zQ*xQ) +
+(xe + t*xd - x0 + xe*xQ^2 + t*xd*xQ^2 - x0*xQ^2 + ye*yQ*xQ + t*yd*yQ*xQ - y0*yQ*xQ + ze*zQ*xQ + t*zd*zQ*xQ - z0*zQ*xQ) +

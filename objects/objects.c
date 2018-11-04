@@ -6,9 +6,11 @@ void addToList (RenderList* list, RenderObject* obj) {
   if (list->start == NULL) {
     list->start = obj;
     list->end = obj;
+    list->end->next = NULL;
   } else {
     list->end->next = obj;
     list->end = obj;
+    list->end->next = NULL;
   }
 
 }

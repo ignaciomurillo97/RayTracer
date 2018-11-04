@@ -7,13 +7,13 @@
 #include "raytracing.h"
 #include "renderEngine.h"
 #include "Helpers/linkedlist.h"
+#include "objects/cylinder.h"
 #include "file.h"
 
 Color** frameBuffer;
 RenderList* renderList;
 
 LinkedList *lights;
-int lightCount;
 Vector* eye;
 Window* w;
 
@@ -55,7 +55,21 @@ int main (int argc, char** argv) {
   initializeWindow(w);
   readFromFile(argv[1], renderList, lights); 
 
-  render(w, eye, lights, lightCount, frameBuffer, renderList);
+//  Cylinder *c = (Cylinder*)malloc(sizeof(Cylinder));
+//  RenderObject* ro = (RenderObject*)malloc(sizeof(RenderObject));
+//  c->radius = 2;
+//  c->center = createVector(0, 0, 0);
+//  c->rotation = createVector(0, 0, 0);
+//  ro->object = c;
+//  ro->intersectionFunction = &rayCylinderIntersection;
+//  ro->normalFunction = &cylinderNormal;
+//  ro->diffuseCoefficient = 1;
+//  ro->specularCoefficient = 32;
+//  ro->type = SphereObject;
+//  ro->color = (Color){0.8, 0.8, 0.8, 1};
+//  addToList(renderList, ro);
+
+  render(w, eye, lights, frameBuffer, renderList);
 
   frameBufferToFile(argv[2], frameBuffer, H_SIZE, V_SIZE);
 

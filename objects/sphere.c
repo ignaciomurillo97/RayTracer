@@ -1,7 +1,6 @@
 #include "sphere.h"
 #include <stdlib.h>
 #include <math.h>
-#include <stdio.h>
 
 double* raySphereIntersection(Ray r, void* obj) {
   Sphere *s = (Sphere*)obj;
@@ -27,8 +26,8 @@ double* raySphereIntersection(Ray r, void* obj) {
     result[0] = 1;
     result[1] = (-beta) / 2.0; 
     return result;
-
   }
+
   double* result = (double*)malloc(sizeof(double) * 3);
   double t1 = (-beta - sqrt(disc)) / 2.0;
   double t2 = (-beta + sqrt(disc)) / 2.0;

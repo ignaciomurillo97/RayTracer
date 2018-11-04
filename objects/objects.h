@@ -36,6 +36,7 @@ typedef struct {
 typedef struct {
   Vector* normal;
   Vector* contactPoint;
+  double t;
   RenderObject* object;
 } Intersection;
 

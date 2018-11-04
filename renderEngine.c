@@ -17,7 +17,7 @@ double smallestPositive(double* list) {
         res = list[i];
       }
     }
-    if (res > 0) return res;
+    if (res > EPSILON) return res;
   }
   return -1;
 } 
@@ -38,7 +38,7 @@ Intersection firstIntersection (Ray r, RenderList* renderList) {
   while (ro != NULL) {
     double* tList = (double*)(*(ro->intersectionFunction))(r, (void*)ro->object);
     double newTMin = smallestPositive(tList);
-    if (newTMin != -1 && newTMin < tMin && newTMin > EPSILON) {
+    if (newTMin != -1 && newTMin < tMin) {
       tMin = newTMin;
       tMinObject = ro;
     }
@@ -52,6 +52,7 @@ Intersection firstIntersection (Ray r, RenderList* renderList) {
     return (Intersection){
       createVector(normal.x, normal.y, normal.z),
       createVector(point.x, point.y, point.z),
+      tMin,
       tMinObject,
     };
   }
@@ -110,7 +111,16 @@ double specularCoeficient(Light light, Ray ray, Intersection i, double specularO
   return coef;
 }
 
-Color whatColor(Ray r, RenderList* renderList, LinkedList* lights, int lightCount) {
+bool ocluded(Light light, Intersection intersection, RenderList* renderList) {
+  Vector l = subtractVector(light.position, *intersection.contactPoint);
+  double distToLight = magnitude(l);
+  l = normalize(l);
+  Ray rayToLight = (Ray) {intersection.contactPoint, &l};
+  Intersection occlusionObj = firstIntersection(rayToLight, renderList);
+  return !(occlusionObj.object != NULL && occlusionObj.t > EPSILON && occlusionObj.t < distToLight);
+}
+
+Color whatColor(Ray r, RenderList* renderList, LinkedList* lights, int depth) {
   double diffCoef = 0;
   double specCoef = 0;
 
@@ -122,10 +132,8 @@ Color whatColor(Ray r, RenderList* renderList, LinkedList* lights, int lightCoun
     Container* c = lights->start;
     while (c != NULL) {
       Light light = *(Light*)c->element;
-      Vector l = subtractVector(light.position, *intersection.contactPoint);
-      l = normalize(l);
-      Ray rayToLight = (Ray) {intersection.contactPoint, &l};
-      if (firstIntersection(rayToLight, renderList).object == NULL) {
+
+      if (ocluded(light, intersection, renderList)) {
         diffCoef += diffuseCoeficient(light, intersection);
         specCoef += specularCoeficient(light, r, intersection, specularObjPercent);
       }
@@ -136,12 +144,24 @@ Color whatColor(Ray r, RenderList* renderList, LinkedList* lights, int lightCoun
     specCoef = crop(specCoef);
     objColor = colorMult(objColor, diffCoef);
     objColor = colorApproach(objColor, (Color){1, 1, 1, 1}, specCoef);
+
+    Color mirrorColor;
+    // espejo 
+    if (depth > 0) {
+      Vector eyeDirection = multVector(*r.direction, -1);
+      Vector mirrorDirection = reflectVector(eyeDirection, *intersection.normal);
+      Ray newRay = (Ray) { intersection.contactPoint, &mirrorDirection };
+      mirrorColor = whatColor(newRay, renderList, lights, depth);
+    }
+
+    objColor = colorApproach(objColor, mirrorColor, 0.7);
+
     return objColor;
   }
   return bgColor;
 }
 
-void render (Window* w, Vector* eye, LinkedList* lights, int lightCount, Color** frameBuffer, RenderList* renderList) {
+void render (Window* w, Vector* eye, LinkedList* lights, Color** frameBuffer, RenderList* renderList) {
   int x, y;
 
   for ( y = 0; y < w->pixelHeight; y++ ) {
@@ -150,7 +170,7 @@ void render (Window* w, Vector* eye, LinkedList* lights, int lightCount, Color**
       Vector dir = subtractVector(v, *eye);
       dir = normalize(dir);
       Ray r = (Ray){ eye, &dir };
-      Color c = whatColor(r, renderList, lights, lightCount);
+      Color c = whatColor(r, renderList, lights, 2);
       frameBuffer[x][w->pixelHeight - y - 1] = c;
     }
   }
