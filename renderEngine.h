@@ -11,5 +11,6 @@ void render (Window* w, Vector* eye, LinkedList* light, Color** frameBuffer, Ren
 #define bgIntensity 0.4
 #define diffuseCorrection 0.8
 #define EPSILON 0.001
+#define ANTIALIAS_ENABLED 0
 
 #endif

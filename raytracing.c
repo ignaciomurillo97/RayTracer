@@ -55,19 +55,21 @@ int main (int argc, char** argv) {
   initializeWindow(w);
   readFromFile(argv[1], renderList, lights); 
 
-//  Cylinder *c = (Cylinder*)malloc(sizeof(Cylinder));
-//  RenderObject* ro = (RenderObject*)malloc(sizeof(RenderObject));
-//  c->radius = 2;
-//  c->center = createVector(0, 0, 0);
-//  c->rotation = createVector(0, 0, 0);
-//  ro->object = c;
-//  ro->intersectionFunction = &rayCylinderIntersection;
-//  ro->normalFunction = &cylinderNormal;
-//  ro->diffuseCoefficient = 1;
-//  ro->specularCoefficient = 32;
-//  ro->type = SphereObject;
-//  ro->color = (Color){0.8, 0.8, 0.8, 1};
-//  addToList(renderList, ro);
+  Cylinder *c = (Cylinder*)malloc(sizeof(Cylinder));
+  RenderObject* ro = (RenderObject*)malloc(sizeof(RenderObject));
+  c->radius = 2;
+  c->center = createVector(4, 0, 0);
+  c->rotation = createVector(0, 0, 0.8);
+  c->length = 100;
+  c->cutSphereRadius = sqrt(pow(c->radius, 2) + pow(c->length, 2));
+  ro->object = c;
+  ro->intersectionFunction = &rayCylinderIntersection;
+  ro->normalFunction = &cylinderNormal;
+  ro->diffuseCoefficient = 1;
+  ro->specularCoefficient = 2;
+  ro->type = SphereObject;
+  ro->color = (Color){0.8, 0.8, 0.8, 1};
+  addToList(renderList, ro);
 
   render(w, eye, lights, frameBuffer, renderList);
 

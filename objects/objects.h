@@ -49,7 +49,7 @@ typedef struct {
 } Light;
 
 void addToList (RenderList* list, RenderObject* obj);
-Vector framebuffToUniverse (Window* w, int x, int y);
+Vector framebuffToUniverse (Window* w, double x, double y);
 double attenuationFactor (Light light, double distToLight);
 
 #endif

@@ -4,6 +4,8 @@
 
 typedef struct {
   double radius;
+  double length;
+  double cutSphereRadius;
   Vector* center;
   Vector* rotation;
 } Cylinder;

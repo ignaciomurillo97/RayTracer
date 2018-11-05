@@ -1,5 +1,6 @@
 #ifndef H_VECTOR
 #define H_VECTOR
+#define VECTOR_ZERO (Vector) {0, 0, 0}
 #include <stdbool.h>
 
 typedef struct {
@@ -34,5 +35,9 @@ Vector rayToPoint(Ray r, double t);
 bool colinearPoints(Vector a, Vector b, Vector c);
 Vector crossProduct (Vector v1, Vector v2);
 Vector reflectVector(Vector v, Vector ref);
-
+double distance(Vector v1, Vector v2);
+double distanceSquared(Vector v1, Vector v2);
+Vector rotateX (Vector v, double radians);
+Vector rotateY (Vector v, double radians);
+Vector rotateZ (Vector v, double radians);
 #endif

@@ -96,3 +96,41 @@ Vector reflectVector(Vector v, Vector ref) {
   offset = multVector(offset, -1);
   return addVector(proyectedVector, offset);
 }
+
+double distance(Vector v1, Vector v2) {
+  return magnitude(subtractVector(v1, v2));
+}
+
+double distanceSquared(Vector v1, Vector v2) {
+  return magnitudeSquared(subtractVector(v1, v2));
+}
+
+Vector rotateX (Vector v, double radians) {
+  double cosign = cos(radians);
+  double sine = sin(radians);
+  return (Vector) {
+    v.x,
+    v.y * cosign + v.z * -sine,
+    v.y * sine + v.z * cosign
+  };
+}
+
+Vector rotateY (Vector v, double radians) {
+  double cosign = cos(radians);
+  double sine = sin(radians);
+  return (Vector) {
+    v.x * cosign + v.z * sine,
+    v.y,
+    v.x * -sine + v.z * cosign
+  };
+}
+
+Vector rotateZ (Vector v, double radians) {
+  double cosign = cos(radians);
+  double sine = sin(radians);
+  return (Vector) {
+    v.x * cosign + v.y * -sine,
+    v.x * sine + v.y * cosign,
+    v.z,
+  };
+}

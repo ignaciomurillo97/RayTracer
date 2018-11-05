@@ -145,16 +145,16 @@ Color whatColor(Ray r, RenderList* renderList, LinkedList* lights, int depth) {
     objColor = colorMult(objColor, diffCoef);
     objColor = colorApproach(objColor, (Color){1, 1, 1, 1}, specCoef);
 
-    Color mirrorColor;
     // espejo 
     if (depth > 0) {
+      Color mirrorColor;
       Vector eyeDirection = multVector(*r.direction, -1);
       Vector mirrorDirection = reflectVector(eyeDirection, *intersection.normal);
       Ray newRay = (Ray) { intersection.contactPoint, &mirrorDirection };
       mirrorColor = whatColor(newRay, renderList, lights, depth);
+      objColor = colorApproach(objColor, mirrorColor, 0.4);
     }
 
-    objColor = colorApproach(objColor, mirrorColor, 0.7);
 
     return objColor;
   }
@@ -166,11 +166,46 @@ void render (Window* w, Vector* eye, LinkedList* lights, Color** frameBuffer, Re
 
   for ( y = 0; y < w->pixelHeight; y++ ) {
     for ( x = 0; x < w->pixelWidth; x++ ) {
-      Vector v = framebuffToUniverse(w, x, y);
-      Vector dir = subtractVector(v, *eye);
-      dir = normalize(dir);
-      Ray r = (Ray){ eye, &dir };
-      Color c = whatColor(r, renderList, lights, 2);
+      Color c;
+      if (ANTIALIAS_ENABLED) {
+        Vector v = framebuffToUniverse(w, x + 0.5, y + 0.5);
+        Vector v1 = framebuffToUniverse(w, x, y);
+        Vector v2 = framebuffToUniverse(w, x + 1, y);
+        Vector v3 = framebuffToUniverse(w, x, y + 1);
+        Vector v4 = framebuffToUniverse(w, x + 1, y + 1);
+
+        Vector dir = normalize(subtractVector(v, *eye));
+        Vector dir1 = normalize(subtractVector(v1, *eye));
+        Vector dir2 = normalize(subtractVector(v2, *eye));
+        Vector dir3 = normalize(subtractVector(v3, *eye));
+        Vector dir4 = normalize(subtractVector(v4, *eye));
+
+        Ray r = (Ray){ eye, &dir };
+        Ray r1 = (Ray){ eye, &dir1 };
+        Ray r2 = (Ray){ eye, &dir2 };
+        Ray r3 = (Ray){ eye, &dir3 };
+        Ray r4 = (Ray){ eye, &dir4 };
+
+        Color c0 = whatColor(r, renderList, lights, 2);
+        Color c1 = whatColor(r1, renderList, lights, 2);
+        Color c2 = whatColor(r2, renderList, lights, 2);
+        Color c3 = whatColor(r3, renderList, lights, 2);
+        Color c4 = whatColor(r4, renderList, lights, 2);
+        
+        c = (Color) {
+          (c0.r + c1.r + c2.r + c3.r + c4.r) / 5,
+          (c0.g + c1.g + c2.g + c3.g + c4.g) / 5,
+          (c0.b + c1.b + c2.b + c3.b + c4.b) / 5,
+          1
+        };
+
+      } else {
+        Vector v = framebuffToUniverse(w, x + 0.5, y + 0.5);
+        Vector dir = subtractVector(v, *eye);
+        dir = normalize(dir);
+        Ray r = (Ray){ eye, &dir };
+        c = whatColor(r, renderList, lights, 0);
+      }
       frameBuffer[x][w->pixelHeight - y - 1] = c;
     }
   }

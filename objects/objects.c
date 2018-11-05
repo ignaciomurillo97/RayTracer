@@ -15,10 +15,10 @@ void addToList (RenderList* list, RenderObject* obj) {
 
 }
 
-Vector framebuffToUniverse (Window* w, int x, int y) {
+Vector framebuffToUniverse (Window* w, double x, double y) {
   return (Vector){
-    w->left + ((x + 0.5) / (float)w->pixelWidth) * (w->right - w->left),
-      w->bot + ((y + 0.5) / (float)w->pixelHeight) * (w->top - w->bot)
+    w->left + ((x) / (float)w->pixelWidth) * (w->right - w->left),
+      w->bot + ((y) / (float)w->pixelHeight) * (w->top - w->bot)
   };
 }
 
